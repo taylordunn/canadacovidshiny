@@ -1,10 +1,7 @@
 Package: canadacovidshiny
-Title: COVID-19 in Canada Shiny Dashboard
+Title: COVID-19 in Canada Dashboard
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "Taylor", family = "Dunn",
-           role = c("aut", "cre"),
-           email = "t.dunn19@gmail.com")
+Authors@R: person('Taylor', 'Dunn', email = 't.dunn19@gmail.com', role = c('cre', 'aut'))
 Description: A Shiny dashboard reporting COVID-19 data in Canada.
 License: What license is it under?
 Imports: 
