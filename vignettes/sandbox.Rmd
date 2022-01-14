@@ -1,0 +1,111 @@
+---
+title: "Sandbox"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Sandbox}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+#library(canadacovidshiny)
+library(canadacovid)
+library(dplyr)
+```
+
+This vignette will serve as a sandbox/notebook for working on the back-end implementation of the dashboard -- the "RMarkdown first" approach as suggested by the [Engineering Shiny](https://engineering-shiny.org/building-ispum-app.html#proto-rmdfirst) book.
+
+## Get summaries
+
+The first and simplest data I want to include is the latest daily counts, both overall and by province, which I retrieve with `get_summary()`
+
+```{r}
+summary_overall <- get_summary()
+summary_province <- get_summary(split = "province")
+glimpse(summary_province)
+```
+
+
+## Checking for new reports
+
+I want to keep the API requests down to a minimum to avoid 429 errors (too many requests in a short time).
+
+The `provinces` table lets me know if and when data has been reported:
+
+```{r}
+provinces <- canadacovid::get_provinces()
+glimpse(provinces)
+```
+
+It will be helpful to put this into an easily-accessible list like so:
+
+```{r}
+province_status <- provinces %>%
+  select(code, name, data_status, updated_at) %>%
+  split(.$code)
+str(province_status[1])
+```
+
+Then I can check the status of each province:
+
+```{r}
+province_status$NS$data_status
+```
+ 
+If the data has been reported for the day, then the data can be updated by calling the API.
+
+## Storing the data
+
+A package I've been meaning to try is [`pin`](https://pins.rstudio.com/).
+It allows me to store R objects remotely (on *boards*), and retrieve and update that data when necessary.
+Create a temporary board (that will be deleted once the R session ends):
+
+```{r}
+library(pins)
+
+board <- board_temp()
+board
+```
+
+Then, save the data to the board:
+
+```{r}
+board %>% pin_write(summary_overall, "summary_overall", type = "rds")
+```
+
+Then retrieve it:
+
+```{r}
+board %>% pin_read("summary_overall")
+```
+
+I can also get some metadata about the data, like when it was `created`:
+
+```{r}
+board %>% pin_meta("summary_overall")
+```
+
+I have a Google Cloud Platform account (free trial for now).
+I'll make a `canadacovidshiny_bucket` just to try it out.
+Unfortunately, I have to use the legacy `pins` API for this task, as [GCP hasn't been implemented in the modern API](https://pins.rstudio.com/articles/pins-update.html#equivalents) as of me writing this:
+
+```{r}
+gcp_board <- board_register_gcloud(
+  name = "gcloud", bucket = "canadacovidshiny_bucket",
+  # TCP token stored locally in my interactive session
+  token = Sys.getenv("GCLOUD_ACCESS_TOKEN")
+)
+pin(summary_overall, name = "summary_overall", board = "gcloud")
+```
+
+```{r}
+pin_get("summary_overall", board = "gcloud")
+```
+
