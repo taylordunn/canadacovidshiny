@@ -10,3 +10,9 @@
   description: ~
   rows: 13
   cols: 23
+- path: reports_on
+  name: reports_on
+  type: table
+  description: ~
+  rows: 722
+  cols: 23
