@@ -40,3 +40,9 @@
   description: ~
   rows: 722
   cols: 23
+- path: reports_bc
+  name: reports_bc
+  type: table
+  description: ~
+  rows: 722
+  cols: 23
