@@ -52,3 +52,9 @@
   description: ~
   rows: 722
   cols: 23
+- path: reports_sk
+  name: reports_sk
+  type: table
+  description: ~
+  rows: 722
+  cols: 23
