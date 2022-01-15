@@ -4,3 +4,9 @@
   description: ~
   rows: 1
   cols: 22
+- path: summary_province
+  name: summary_province
+  type: table
+  description: ~
+  rows: 13
+  cols: 23
