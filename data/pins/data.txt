@@ -1,0 +1,6 @@
+- path: summary_overall
+  name: summary_overall
+  type: table
+  description: ~
+  rows: 1
+  cols: 22
