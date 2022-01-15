@@ -58,3 +58,9 @@
   description: ~
   rows: 722
   cols: 23
+- path: reports_ab
+  name: reports_ab
+  type: table
+  description: ~
+  rows: 722
+  cols: 23
