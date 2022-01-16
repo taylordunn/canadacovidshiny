@@ -5,7 +5,7 @@
 \alias{overall_report}
 \title{COVID-19 report}
 \format{
-A data frame with 720 rows and 22 variables.
+A tibble with 720 rows and 22 variables.
 }
 \source{
 \url{https://api.covid19tracker.ca/}

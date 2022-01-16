@@ -6,13 +6,21 @@ Description: A Shiny dashboard reporting COVID-19 data in Canada.
 License: MIT + file LICENSE
 Imports: 
     attempt,
+    canadacovid,
     config (>= 0.3.1),
+    dplyr,
     DT,
+    ggplot2,
     glue,
     golem (>= 0.3.1),
     htmltools,
+    pins,
     processx,
-    shiny (>= 1.6.0)
+    purrr,
+    RcppRoll,
+    shiny (>= 1.6.0),
+    stringr,
+    tidyr
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1

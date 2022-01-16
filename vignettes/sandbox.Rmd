@@ -18,20 +18,25 @@ knitr::opts_chunk$set(
 #library(canadacovidshiny)
 library(canadacovid)
 library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(purrr)
+library(stringr)
+
+theme_set(theme_minimal())
 ```
 
 This vignette will serve as a sandbox/notebook for working on the back-end implementation of the dashboard -- the "RMarkdown first" approach as suggested by the [Engineering Shiny](https://engineering-shiny.org/building-ispum-app.html#proto-rmdfirst) book.
 
-## Get summaries
+## Summaries
 
-The first and simplest data I want to include is the latest daily counts, both overall and by province, which I retrieve with `get_summary()`
+The first and simplest data I want to include is the latest daily counts, both overall and by province, which I retrieve with `get_summary()`:
 
 ```{r}
 summary_overall <- get_summary()
 summary_province <- get_summary(split = "province")
 glimpse(summary_province)
 ```
-
 
 ## Checking for new reports
 
@@ -63,7 +68,7 @@ If the data has been reported for the day, then the data can be updated by calli
 
 ## Storing the data
 
-A package I've been meaning to try is [`pin`](https://pins.rstudio.com/).
+A package I've been meaning to try is [`pins`](https://pins.rstudio.com/).
 It allows me to store R objects remotely (on *boards*), and retrieve and update that data when necessary.
 Create a temporary board (that will be deleted once the R session ends):
 
@@ -74,7 +79,7 @@ board <- board_temp()
 board
 ```
 
-Then, save the data to the board:
+Then save the data to the board:
 
 ```{r}
 board %>% pin_write(summary_overall, "summary_overall", type = "rds")
@@ -92,11 +97,32 @@ I can also get some metadata about the data, like when it was `created`:
 board %>% pin_meta("summary_overall")
 ```
 
-I have a Google Cloud Platform account (free trial for now).
-I'll make a `canadacovidshiny_bucket` just to try it out.
-Unfortunately, I have to use the legacy `pins` API for this task, as [GCP hasn't been implemented in the modern API](https://pins.rstudio.com/articles/pins-update.html#equivalents) as of me writing this:
+`pins` has numerous options for storing boards, including RStudio connect, Amazon S3, and Google Cloud Platform.
+For now, I'll register a board on my GitHub, in this repository (`canadacovidshiny`).
+^[Note that I don't need to provide my personal access `token` argument to register the board, because it is retrieved for me from `gitcreds`.]
+Unfortunately, I have to use the legacy `pins` API for this task, because [GitHub boards haven't been implemented in the modern API](https://pins.rstudio.com/articles/pins-update.html#equivalents) as of me writing this:
 
 ```{r}
+board <- board_register_github(
+  name = "github", repo = "taylordunn/canadacovidshiny", path = "data/pins"
+)
+```
+
+Pin `summary_overall`:
+
+```{r eval=FALSE}
+pin(summary_overall, name = "summary_overall", board = "github")
+```
+
+And get it:
+
+```{r}
+pin_get("summary_overall", board = "github")
+```
+
+```{r eval=FALSE, include=FALSE}
+# I have a Google Cloud Platform account (free trial for now).
+# I'll make a `canadacovidshiny_bucket` just to try it out.
 gcp_board <- board_register_gcloud(
   name = "gcloud", bucket = "canadacovidshiny_bucket",
   # TCP token stored locally in my interactive session
@@ -105,7 +131,77 @@ gcp_board <- board_register_gcloud(
 pin(summary_overall, name = "summary_overall", board = "gcloud")
 ```
 
+Also store the province-level summaries:
+
+```{r eval=FALSE}
+summary_province <- get_summary(split = "province")
+pin(summary_province, name = "summary_province", board = "github")
+```
+
+
 ```{r}
-pin_get("summary_overall", board = "gcloud")
+pin_get("summary_province", board = "github")
+```
+
+## Reports
+
+The reports are larger data frames, which I will want `overall` and by `province`:
+
+```{r}
+report_overall <- get_reports()
+
+# Use the `province` = "AB", "BC", etc. argument instead of `split` = "province"
+# The former lets me request one province at a time, and only when data has
+#  been updated. The latter runs 13 requests at once, every time.
+province_codes <- provinces$code
+
+reports_province <- map(province_codes, ~ get_reports(province = .x)) %>%
+  setNames(province_codes)
+
+reports_province$NB
+```
+
+Store each set of province reports into separate pins:
+
+```{r eval=FALSE}
+iwalk(
+  reports_province,
+  function(reports, province_code) {
+    pin_name <- paste0("reports_", tolower(province_code))
+    pin(reports, name = pin_name, board = "github")
+  }
+)
+```
+
+I will frequently want the rolling averages of various counts.
+The `RcppRoll` package can do this:
+
+```{r}
+library(RcppRoll)
+
+reports_ns <- pin_get("reports_ns", board = "github")
+reports_ns <- reports_ns %>%
+  mutate(
+    across(starts_with("change_"),
+           ~ roll_mean(.x, n = 7, align = "right", fill = NA),
+           .names = "{.col}_roll_7")
+  )
+```
+
+Then I can plot all of the rolling averages:
+
+```{r}
+reports_ns %>%
+  select(date, matches("roll")) %>%
+  pivot_longer(cols = -date) %>%
+  filter(!is.na(value)) %>%
+  ggplot(aes(x = date, y = value)) +
+  geom_line() +
+  facet_wrap(
+    ~ name,
+    # This will remove the prefix ("change_") and suffix ("_roll_7")
+    labeller = labeller(name = ~ str_remove_all(.x, "change_|_roll_7")),
+    scales = "free_y", ncol = 2
+  )
 ```
 
