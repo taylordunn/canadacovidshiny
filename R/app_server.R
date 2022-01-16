@@ -5,5 +5,17 @@
 #' @import shiny
 #' @noRd
 app_server <- function(input, output, session) {
-  # Your application server logic
+  set.seed(122)
+  histdata <- rnorm(500)
+
+  output$plot1 <- renderPlot({
+    data <- histdata[seq_len(input$slider)]
+    hist(data)
+  })
+
+  summary_overall <- reactive(read_summary(split = "overall"))
+  summary_province <- reactive(read_summary(split = "province"))
+
+  mod_summary_row_server("overall")
+  #mod_summary_row_server("nb", summary_province)
 }
