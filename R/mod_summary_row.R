@@ -24,20 +24,22 @@ mod_summary_row_ui <- function(id) {
 #' @noRd
 #'
 #' @importFrom shinydashboard renderValueBox
-mod_summary_row_server <- function(id) {
+mod_summary_row_server <- function(id, summary_data) {
+  #stopifnot(is.reactive(data))
+
   moduleServer(id, function(input, output, session) {
-    #ns <- session$ns
-    data <- reactive(summary_overall)
+    cases_text <- reactive(summary_data()$change_case)
+    hospitalizations_text <- reactive(data()$change_hospitalizations)
 
     output$cases <- renderValueBox({
       valueBox(
-        "Cases", data()$change_cases, icon = icon("virus")
+        "Cases", cases_text(), icon = icon("virus")
       )
     })
 
     output$hospitalizations <- renderValueBox({
       valueBox(
-        "Hospitalizations", data()$change_hospitalizations,
+        "Hospitalizations", hospitalizations_text(),
         icon = icon("virus")
       )
     })

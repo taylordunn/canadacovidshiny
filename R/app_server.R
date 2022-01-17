@@ -15,7 +15,9 @@ app_server <- function(input, output, session) {
 
   summary_overall <- reactive(read_summary(split = "overall"))
   summary_province <- reactive(read_summary(split = "province"))
+  # summary_overall <- read_summary(split = "overall")
+  # summary_province <- read_summary(split = "province")
 
-  mod_summary_row_server("overall")
+  mod_summary_row_server("overall", summary_overall())
   #mod_summary_row_server("nb", summary_province)
 }

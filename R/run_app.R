@@ -12,6 +12,8 @@ run_app <- function(onStart = NULL,
                     enableBookmarking = NULL,
                     uiPattern = "/",
                     ...) {
+  board <- register_github_board()
+
   with_golem_options(
     app = shinyApp(
       ui = app_ui,
