@@ -14,19 +14,19 @@ app_ui <- function(request) {
       dashboardSidebar(
         sidebarMenu(
           menuItem("Overall", tabName = "overall", icon = icon("dashboard")),
-          menuItem("Alberta", tabName = "ab"),
-          menuItem("British Columbia", tabName = "bc"),
-          menuItem("Manitoba", tabName = "mb"),
-          menuItem("New Brunswick", tabName = "nb", icon = icon("th")),
-          menuItem("Newfoundland and Labrador", tabName = "nl"),
-          menuItem("Northwest Territories", tabName = "nt"),
-          menuItem("Nova Scotia", tabName = "ns", icon = icon("th")),
-          menuItem("Nunavut", tabName = "nu"),
-          menuItem("Ontario", tabName = "on"),
-          menuItem("Prince Edward Island", tabName = "pe"),
-          menuItem("Quebec", tabName = "qc"),
-          menuItem("Saskatchewan", tabName = "sk"),
-          menuItem("Yukon", tabName = "yt"),
+          menuItem("Alberta", tabName = "AB"),
+          menuItem("British Columbia", tabName = "BC"),
+          menuItem("Manitoba", tabName = "MB"),
+          menuItem("New Brunswick", tabName = "NB", icon = icon("th")),
+          menuItem("Newfoundland and Labrador", tabName = "NL"),
+          menuItem("Northwest Territories", tabName = "NT"),
+          menuItem("Nova Scotia", tabName = "NS", icon = icon("th")),
+          menuItem("Nunavut", tabName = "NU"),
+          menuItem("Ontario", tabName = "ON"),
+          menuItem("Prince Edward Island", tabName = "PE"),
+          menuItem("Quebec", tabName = "QC"),
+          menuItem("Saskatchewan", tabName = "SK"),
+          menuItem("Yukon", tabName = "YT"),
           menuItem("Source code", icon = icon("file-code-o"),
                    href = "https://github.com/taylordunn/canadacovidshiny")
         )
@@ -38,58 +38,59 @@ app_ui <- function(request) {
             mod_daily_counts_ui("overall")
           ),
           tabItem(
-            tabName = "ab",
-            mod_last_updated_ui("ab"),
-            mod_daily_counts_ui("ab")
+            tabName = "AB",
+            mod_last_updated_ui("AB"),
+            mod_daily_counts_ui("AB")
           ),
           tabItem(
-            tabName = "bc",
-            mod_last_updated_ui("bc"),
-            mod_daily_counts_ui("bc")
+            tabName = "BC",
+            mod_last_updated_ui("BC"),
+            mod_daily_counts_ui("BC")
           ),
           tabItem(
-            tabName = "mb",
-            mod_daily_counts_ui("mb")
+            tabName = "MB",
+            mod_last_updated_ui("MB"),
+            mod_daily_counts_ui("MB")
           ),
           tabItem(
-            tabName = "nb",
-            mod_daily_counts_ui("nb")
+            tabName = "NB",
+            mod_daily_counts_ui("NB")
           ),
           tabItem(
-            tabName = "nl",
-            mod_daily_counts_ui("nl")
+            tabName = "NL",
+            mod_daily_counts_ui("NL")
           ),
           tabItem(
-            tabName = "ns",
-            mod_daily_counts_ui("ns")
+            tabName = "NS",
+            mod_daily_counts_ui("NS")
           ),
           tabItem(
-            tabName = "nt",
-            mod_daily_counts_ui("nt")
+            tabName = "NT",
+            mod_daily_counts_ui("NT")
           ),
           tabItem(
-            tabName = "nu",
-            mod_daily_counts_ui("nu")
+            tabName = "NU",
+            mod_daily_counts_ui("NU")
           ),
           tabItem(
-            tabName = "on",
-            mod_daily_counts_ui("on")
+            tabName = "ON",
+            mod_daily_counts_ui("ON")
           ),
           tabItem(
-            tabName = "pe",
-            mod_daily_counts_ui("pe")
+            tabName = "PE",
+            mod_daily_counts_ui("PE")
           ),
           tabItem(
-            tabName = "qc",
-            mod_daily_counts_ui("qc")
+            tabName = "QC",
+            mod_daily_counts_ui("QC")
           ),
           tabItem(
-            tabName = "sk",
-            mod_daily_counts_ui("sk")
+            tabName = "SK",
+            mod_daily_counts_ui("SK")
           ),
           tabItem(
-            tabName = "yt",
-            mod_daily_counts_ui("yt")
+            tabName = "YT",
+            mod_daily_counts_ui("YT")
           )
         )
       )

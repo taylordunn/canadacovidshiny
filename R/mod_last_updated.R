@@ -10,14 +10,12 @@
 mod_last_updated_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    #fluidRow(
-      box(
-        title = span(icon("info-circle"), "Data last updated"),
-        #solidHeader = TRUE,
-        collapsible = TRUE, width = 12,
-        textOutput(ns("last_updated"))
-      )
-    #)
+    box(
+      title = span(icon("info-circle"), "Data last updated"),
+      #solidHeader = TRUE,
+      collapsible = TRUE, width = 12,
+      textOutput(ns("last_updated"))
+    )
   )
 }
 
@@ -32,7 +30,7 @@ mod_last_updated_server <- function(id, provinces) {
   moduleServer(id, function(input, output, session) {
     #output$last_updated <- renderUI({
     output$last_updated <- renderText({
-      d <- provinces() %>% dplyr::filter(code == toupper(.env$id))
+      d <- provinces() %>% dplyr::filter(code == .env$id)
 
       paste0(
         "Data from the province last updated at ",
