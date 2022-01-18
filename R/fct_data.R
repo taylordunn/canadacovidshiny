@@ -22,6 +22,15 @@ province_codes <- list(
   "Quebec" = "QC", "Saskatchewan" = "SK", "Yukon" = "YT"
 )
 
+#' Reads in the province data from pins board
+#'
+#' @return A data frame.
+#'
+#' @importFrom pins pin_get
+read_provinces <- function() {
+  pins::pin_get("provinces", board = "github")
+}
+
 #' Reads in the summary data from pins board
 #'
 #' @param split One of "overall" (aggregated counts across Canada) or "province"
