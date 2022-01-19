@@ -34,67 +34,51 @@ mod_daily_counts_ui <- function(id) {
 #' @importFrom shinydashboard renderValueBox valueBox
 #' @importFrom dplyr filter
 #' @importFrom scales comma
+#' @importFrom purrr map walk
+#' @importFrom stringr str_to_sentence
 mod_daily_counts_server <- function(id, reports_data) {
   # Get the most recent numbers
-  data <- reactive(reports_data() %>% dplyr::filter(date == max(date)))
+  data <- reactive(
+    reports_data() %>%
+      dplyr::filter(date == max(date)) %>%
+      # Instead of reporting cumulative cases, report an estimate of active cases
+      dplyr::mutate(
+        total_cases = total_cases - total_recoveries - total_fatalities
+      )
+  )
+  vars <- c("cases", "hospitalizations", "criticals", "fatalities",
+            "vaccinations", "boosters_1")
+  var_labels <- list(
+    "cases" = "Cases (estimated active)",
+    "hospitalizations" = "Hospitalizations (total)",
+    "criticals" = "Criticals (total)",
+    "fatalities" = "Fatalities (total)",
+    "vaccinations" = "Vaccinations (total)",
+    "boosters_1" = "Boosters (total)"
+  )
+  var_counts <- purrr::map(
+    vars,
+    function(var) {
+      reactive(
+        paste0(scales::comma(data()[[paste0("change_", var)]]), " (",
+               scales::comma(data()[[paste0("total_", var)]]), ")")
+      )
+    }
+  ) %>%
+    setNames(vars)
+
 
   moduleServer(id, function(input, output, session) {
-    #ns <- session$ns
-    cases_text <- reactive(
-      paste0(scales::comma(data()$change_cases), " (",
-             scales::comma(data()$total_cases), ")")
-    )
-    hospitalizations_text <- reactive(
-      paste0(scales::comma(data()$change_hospitalizations), " (",
-             scales::comma(data()$total_hospitalizations), ")")
-    )
-    criticals_text <- reactive(
-      paste0(scales::comma(data()$change_criticals), " (",
-             scales::comma(data()$total_criticals), ")")
-    )
-    fatalities_text <- reactive(
-      paste0(scales::comma(data()$change_fatalities), " (",
-             scales::comma(data()$total_fatalities), ")")
-    )
-    vaccinations_text <- reactive(
-      paste0(scales::comma(data()$change_vaccinations), " (",
-             scales::comma(data()$total_vaccinations), ")")
-    )
-    boosters_1_text <- reactive(
-      paste0(scales::comma(data()$change_boosters_1), " (",
-             scales::comma(data()$total_boosters_1), ")")
-    )
-
-    output$cases <- renderValueBox({
-      valueBox(
-        cases_text(), "Cases (active)", icon = icon("virus")
-      )
-    })
-    output$hospitalizations <- renderValueBox({
-      valueBox(
-        hospitalizations_text(), "Hospitalizations (total)",
-        icon = icon("hospital")
-      )
-    })
-    output$criticals <- renderValueBox({
-      valueBox(
-        criticals_text(), "Criticals (total)", icon = icon("procedures")
-      )
-    })
-    output$fatalities <- renderValueBox({
-      valueBox(
-        fatalities_text(), "Fatalities (total)", icon = icon("coffin")
-      )
-    })
-    output$vaccinations <- renderValueBox({
-      valueBox(
-        vaccinations_text(), "Vaccinations (total)", icon = icon("syringe")
-      )
-    })
-    output$boosters_1 <- renderValueBox({
-      valueBox(
-        boosters_1_text(), "Boosters (total)", icon = icon("syringe")
-      )
-    })
+    purrr::walk(
+      vars,
+      function(var) {
+        output[[var]] <- renderValueBox({
+          valueBox(
+            var_counts[[var]](),
+            subtitle = var_labels[[var]],
+            color = var_colors[[var]], icon = var_icons[[var]]
+          )
+        })
+      })
   })
 }

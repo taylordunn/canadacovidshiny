@@ -68,7 +68,6 @@ read_reports <- function(choice = NULL) {
     choice <- match.arg(tolower(choice), choices = choices)
 
     pins::pin_get(paste0("reports_", choice), board = "github")
-
   }
 }
 

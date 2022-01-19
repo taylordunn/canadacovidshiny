@@ -10,7 +10,8 @@ app_ui <- function(request) {
     golem_add_external_resources(),
 
     dashboardPage(
-      dashboardHeader(title = "Canadian COVID-19 Dashboard"),
+      dashboardHeader(title = "Canadian COVID-19 Dashboard",
+                      titleWidth = 450),
       dashboardSidebar(
         sidebarMenu(
           menuItem("Overall", tabName = "overall", icon = icon("dashboard")),
@@ -35,17 +36,20 @@ app_ui <- function(request) {
         tabItems(
           tabItem(
             tabName = "overall",
-            mod_daily_counts_ui("overall")
+            mod_daily_counts_ui("overall"),
+            mod_change_plot_ui("overall")
           ),
           tabItem(
             tabName = "AB",
             mod_last_updated_ui("AB"),
             mod_daily_counts_ui("AB")
+            #mod_change_plot_ui("AB")
           ),
           tabItem(
             tabName = "BC",
             mod_last_updated_ui("BC"),
             mod_daily_counts_ui("BC")
+            #mod_change_plot_ui("BC")
           ),
           tabItem(
             tabName = "MB",
@@ -54,42 +58,52 @@ app_ui <- function(request) {
           ),
           tabItem(
             tabName = "NB",
+            mod_last_updated_ui("NB"),
             mod_daily_counts_ui("NB")
           ),
           tabItem(
             tabName = "NL",
+            mod_last_updated_ui("NL"),
             mod_daily_counts_ui("NL")
           ),
           tabItem(
             tabName = "NS",
+            mod_last_updated_ui("NS"),
             mod_daily_counts_ui("NS")
           ),
           tabItem(
             tabName = "NT",
+            mod_last_updated_ui("NT"),
             mod_daily_counts_ui("NT")
           ),
           tabItem(
             tabName = "NU",
+            mod_last_updated_ui("NU"),
             mod_daily_counts_ui("NU")
           ),
           tabItem(
             tabName = "ON",
+            mod_last_updated_ui("ON"),
             mod_daily_counts_ui("ON")
           ),
           tabItem(
             tabName = "PE",
+            mod_last_updated_ui("PE"),
             mod_daily_counts_ui("PE")
           ),
           tabItem(
             tabName = "QC",
+            mod_last_updated_ui("QC"),
             mod_daily_counts_ui("QC")
           ),
           tabItem(
             tabName = "SK",
+            mod_last_updated_ui("SK"),
             mod_daily_counts_ui("SK")
           ),
           tabItem(
             tabName = "YT",
+            mod_last_updated_ui("YT"),
             mod_daily_counts_ui("YT")
           )
         )

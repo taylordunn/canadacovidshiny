@@ -6,21 +6,25 @@
 #' @importFrom purrr map walk
 #' @noRd
 app_server <- function(input, output, session) {
-  provinces <- reactive(read_provinces())
-  reports_overall <- reactive(read_reports("overall"))
+  board <- register_github_board()
+  set_plotting_defaults()
 
-  reports_province <- purrr::map(
-    province_codes, ~ reactive(read_reports(.x))
+  provinces <- reactiveVal(read_provinces())
+
+  reports <- purrr::map(
+    c("overall", province_codes),
+    ~ reactiveVal(read_reports(.x))
   ) %>%
-    setNames(province_codes)
+    setNames(c("overall", province_codes))
 
-  mod_daily_counts_server("overall", reports_overall)
-
+  mod_daily_counts_server("overall", reports$overall)
+  mod_change_plot_server("overall", reports$overall)
   purrr::walk(
     province_codes,
     ~{
-      mod_last_updated_server(.x, provinces)
-      mod_daily_counts_server(.x, reports_province[[.x]])
+      mod_last_updated_server(.x, provinces, reports)
+      mod_daily_counts_server(.x, reports[[.x]])
+      #mod_change_plot_server(.x, reports[[.x]])
     }
   )
 }

@@ -14,7 +14,8 @@ mod_last_updated_ui <- function(id) {
       title = span(icon("info-circle"), "Data last updated"),
       #solidHeader = TRUE,
       collapsible = TRUE, width = 12,
-      textOutput(ns("last_updated"))
+      textOutput(ns("last_updated")),
+      actionButton(ns("check_updated"), "Check for new data")
     )
   )
 }
@@ -24,11 +25,8 @@ mod_last_updated_ui <- function(id) {
 #' @noRd
 #'
 #' @importFrom rlang .env
-mod_last_updated_server <- function(id, provinces) {
-  #d <- reactive(provinces() %>% dplyr::filter(province == toupper(id)))
-
+mod_last_updated_server <- function(id, provinces, reports) {
   moduleServer(id, function(input, output, session) {
-    #output$last_updated <- renderUI({
     output$last_updated <- renderText({
       d <- provinces() %>% dplyr::filter(code == .env$id)
 
@@ -37,11 +35,27 @@ mod_last_updated_server <- function(id, provinces) {
         d$updated_at, " (status: ", d$data_status, ")"
       )
     })
+
+    observeEvent(input$check_updated, {
+      provinces_new <- canadacovid::get_provinces()
+
+      # Compare the `updated_at` timestamps to determine which provinces have
+      #  been updated
+      provinces_updated <- provinces_new %>%
+        dplyr::anti_join(provinces(), by = c("code", "updated_at")) %>%
+        dplyr::pull(code)
+
+      if (length(provinces_updated) > 0) {
+        provinces(provinces_new)
+
+        # Update the reports of all the new data
+        for (p in provinces_updated) {
+          reports[[p]](canadacovid::get_reports(province = p))
+        }
+        # Update the overall data
+        reports$overall(canadacovid::get_reports("overall"))
+      }
+    })
   })
 }
 
-## To be copied in the UI
-# mod_last_updated_ui("last_updated_ui_1")
-
-## To be copied in the server
-# mod_last_updated_server("last_updated_ui_1")

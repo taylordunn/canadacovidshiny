@@ -205,3 +205,99 @@ reports_ns %>%
   )
 ```
 
+## Plots
+
+Here's the ggplot2 theme I'll use:
+
+```{r}
+extrafont::loadfonts(device = "win", quiet = TRUE)
+library(showtext)
+sysfonts::font_add_google("Roboto Condensed", "roboto")
+showtext_auto()
+theme_canadacovid <- function(base_size = 16, base_family = "roboto",
+                              base_grey = "grey85") {
+  theme_minimal(base_size = base_size, base_family = base_family) +
+    theme(
+      panel.grid.minor = element_blank(),
+      plot.title = element_text(face = "bold"),
+      axis.title = element_text(face = "bold"),
+      strip.text = element_text(face = "bold", size = rel(0.8), hjust = 0),
+      strip.background = element_rect(fill = base_grey, color = NA),
+      legend.title = element_text(face = "bold")
+    )
+}
+```
+
+
+```{r}
+var_colors <-
+  list(
+    #"cases" = "#e9c46a",
+    #"cases" = "#f4a261",
+    "cases" = "#f8961e",
+    "hospitalizations" = "#f3722c",
+    "criticals" = "#f3722c",
+    "fatalities" = "#f94144",
+    "recoveries" = "#90be6d",
+    "vaccinations" = "#43aa8b",
+    "boosters_1" = "#577590"
+  )
+```
+
+I think the main plot I want to display is cases:
+
+```{r}
+library(ggtext)
+
+plot_change <- function(reports_province, var = "cases", rolling_window = 7) {
+  var_color <- var_colors[[var]]
+  change_var <- paste0("change_", var)
+  change_var_rolling_avg <- paste0(change_var, "_rolling_avg")
+  reports_province <- reports_province %>%
+    mutate(
+      across(change_var,
+             ~ roll_mean(.x, n = rolling_window, align = "right", fill = NA),
+             .names = "{.col}_rolling_avg")
+    ) %>%
+    filter(across(change_var_rolling_avg, ~ !is.na(.)))
+    
+  latest_val <- reports_province %>%
+    filter(date == max(date)) %>%
+    pull(change_var_rolling_avg) %>%
+    round(1)
+  latest_val_label <- glue::glue(
+    "<b style='color:{var_color}'>{latest_val}</b>"
+  )
+  
+  reports_province %>%
+    ggplot(aes(x = date, y = !!sym(change_var_rolling_avg))) +
+    geom_line(size = 1, color = var_color) +
+    geom_point(data = . %>% filter(date == max(date)),
+               size = 2, color = var_color) +
+    labs(
+      title = paste0(stringr::str_to_sentence(var),
+                     " (", rolling_window, "-day rolling average)"),
+      y = NULL, x = NULL
+    ) +
+    scale_y_continuous(
+      sec.axis = sec_axis(~ ., breaks = latest_val, labels = latest_val_label)
+    ) +
+    scale_x_date(expand = expansion(mult = c(0, 0.01))) +
+    theme_canadacovid() +
+    theme(axis.text.y.right = element_markdown())
+}
+```
+
+```{r}
+plot_change(reports_ns, var = "cases", rolling_window = 7)
+plot_change(reports_ns, var = "fatalities", rolling_window = 7)
+plot_change(reports_ns, var = "hospitalizations", rolling_window = 30)
+plot_change(reports_ns, var = "criticals", rolling_window = 30)
+plot_change(reports_ns, var = "vaccinations", rolling_window = 30)
+plot_change(reports_ns, var = "boosters_1", rolling_window = 7)
+```
+
+
+## Colors
+
+
