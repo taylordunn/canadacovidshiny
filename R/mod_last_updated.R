@@ -14,8 +14,14 @@ mod_last_updated_ui <- function(id) {
       title = span(icon("info-circle"), "Data last updated"),
       solidHeader = TRUE,
       collapsible = TRUE, width = 12,
-      textOutput(ns("last_updated")),
-      actionButton(ns("check_updated"), "Check for new data")
+      fluidRow(
+        column(4,
+          htmlOutput(ns("last_updated")),
+        ),
+        column(4,
+          actionButton(ns("check_updated"), "Check for new data")
+        )
+      )
     )
   )
 }
@@ -27,15 +33,23 @@ mod_last_updated_ui <- function(id) {
 #' @importFrom rlang .env
 #' @importFrom dplyr filter anti_join pull
 #' @importFrom canadacovid get_provinces get_reports
+#' @importFrom lubridate with_tz
 mod_last_updated_server <- function(id, provinces, reports) {
   moduleServer(id, function(input, output, session) {
-    output$last_updated <- renderText({
-      d <- provinces() %>% dplyr::filter(code == .env$id)
+    output$last_updated <- renderUI({
+      d_prov <- provinces() %>% dplyr::filter(code == .env$id) %>%
+        dplyr::pull(updated_at) %>%
+        lubridate::with_tz(tzone = province_timezones[[id]]) %>%
+        format(usetz = TRUE)
+      d_api <- reports[[id]]() %>% dplyr::pull(last_updated) %>% unique() %>%
+        lubridate::with_tz(tzone = province_timezones[[id]]) %>%
+        format(usetz = TRUE)
 
-      paste0(
-        "Data from the province was last reported at ",
-        d$updated_at, " (status: ", d$data_status, ")"
-      )
+      HTML(paste0(
+        "Data from the province was last reported at: ", d_prov, ".<br>",
+        "Data from the API was last updated at: ", d_api, ".<br>",
+        "(Timezone: ", province_timezones[[id]], ")"
+      ))
     })
 
     observeEvent(input$check_updated, {

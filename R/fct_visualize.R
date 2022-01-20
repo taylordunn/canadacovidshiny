@@ -52,7 +52,8 @@ theme_canadacovid <- function(base_size = 16, base_family = "roboto",
   ggplot2::theme_minimal(base_size = base_size, base_family = base_family) +
     ggplot2::theme(
       panel.grid.minor = ggplot2::element_blank(),
-      plot.title = ggplot2::element_text(face = "bold"),
+      plot.title = ggplot2::element_text(size = ggplot2::rel(1.0),
+                                         face = "bold"),
       axis.title = ggplot2::element_text(face = "bold"),
       strip.text = ggplot2::element_text(face = "bold",
                                          size = ggplot2::rel(0.8), hjust = 0),
@@ -72,10 +73,24 @@ set_plotting_defaults <- function() {
 }
 
 
+var_labels <- list(
+  "Cases" = "cases",
+  "Hospitalizations" = "hospitalizations",
+  "Criticals" =  "criticals",
+  "Fatalities" = "fatalities",
+  "Recoveries" = "recoveries",
+  "Vaccinations" = "vaccinations",
+  "Boosters" = "boosters_1"
+)
+
 #' Plot change over time.
 #'
-#' @param reports The reports data from a single province (or overall)
-#' @param var One of
+#' @param reports The reports data from a single province (or overall).
+#' @param var One of the counts in the reports data.
+#' @param rolling_window Number of days to average over.
+#' @param log_var Plot on a log 10 scale.
+#' @param per_1000 Plot per 1000 people (requires numeric `population`).
+#' @param population The population of the province (or overall).
 #'
 #' @noRd
 #' @importFrom rlang sym
@@ -83,7 +98,8 @@ plot_change <- function(
   reports,
   var = c("cases", "hospitalizations", "criticals", "fatalities", "recoveries",
           "vaccinations", "boosters_1"),
-  rolling_window = 7
+  rolling_window = 7, log_var = FALSE, per_1000 = FALSE, population = NULL,
+  min_date = NULL, max_date = NULL
 ) {
   var <- match.arg(var)
   var_color <- var_colors_pastel[[var]]
@@ -99,6 +115,18 @@ plot_change <- function(
     ) %>%
     dplyr::filter(dplyr::across(change_var_rolling_avg, ~ !is.na(.)))
 
+  if (per_1000 & !is.null(population)) {
+    reports <- reports %>%
+      dplyr::mutate(
+        dplyr::across(change_var_rolling_avg, ~ 1000 * .x / population)
+      )
+    p_title <- paste0(stringr::str_to_sentence(var), " per 1000 people",
+                      " (", rolling_window, "-day rolling average)")
+  } else {
+    p_title <- paste0(stringr::str_to_sentence(var),
+                      " (", rolling_window, "-day rolling average)")
+  }
+
   latest_val <- reports %>%
     dplyr::filter(date == max(date)) %>%
     dplyr::pull(change_var_rolling_avg) %>%
@@ -107,21 +135,34 @@ plot_change <- function(
     "<b style='color:{var_color}'>{latest_val}</b>"
   )
 
-  reports %>%
+  p <- reports %>%
     ggplot2::ggplot(ggplot2::aes(x = date, y = !!sym(change_var_rolling_avg))) +
     ggplot2::geom_line(size = 1, color = var_color) +
     ggplot2::geom_point(data = . %>% dplyr::filter(date == max(date)),
                size = 2, color = var_color) +
     ggplot2::labs(
-      title = paste0(stringr::str_to_sentence(var),
-                     " (", rolling_window, "-day rolling average)"),
-      y = NULL, x = NULL
-    ) +
-    ggplot2::scale_y_continuous(
-      sec.axis = ggplot2::sec_axis(~ ., breaks = latest_val,
-                                   labels = latest_val_label)
+      title = p_title, y = NULL, x = NULL
     ) +
     ggplot2::scale_x_date(expand = ggplot2::expansion(mult = c(0, 0.01))) +
     theme_canadacovid(base_family = "") +
+    # Note that the secondary axis will not render if using plotly
     ggplot2::theme(axis.text.y.right = ggtext::element_markdown())
+
+  if (log_var) {
+    p <- p + ggplot2::scale_y_log10(
+      sec.axis = ggplot2::sec_axis(~ ., breaks = latest_val,
+                                   labels = latest_val_label)
+    )
+  } else {
+    p <- p + ggplot2::scale_y_continuous(
+      sec.axis = ggplot2::sec_axis(~ ., breaks = latest_val,
+                                   labels = latest_val_label)
+    )
+  }
+
+  if (!is.null(min_date) & !is.null(max_date)) {
+    p <- p + ggplot2::coord_cartesian(xlim = c(min_date, max_date))
+  }
+
+  p
 }

@@ -23,6 +23,18 @@ province_codes <- list(
   "Quebec" = "QC", "Saskatchewan" = "SK", "Yukon" = "YT"
 )
 
+#' The list of time zones for each province
+#'
+#' @noRd
+province_timezones <- list(
+  "AB" = "Canada/Mountain", "BC" = "Canada/Pacific", "MB" = "Canada/Central",
+  "NB" = "Canada/Atlantic", "NL" = "Canada/Newfoundland",
+  "NT" = "Canada/Mountain", "NS" = "Canada/Atlantic",
+  "NU" = "Canada/Central", "ON" = "Canada/Eastern", "PE" = "Canada/Atlantic",
+  "QC" = "Canada/Eastern", "SK" = "Canada/Saskatchewan", "YT" = "Canada/Yukon",
+  "overall" = "Canada/Eastern"
+)
+
 #' Reads in the province data from pins board
 #'
 #' @return A data frame.

@@ -296,6 +296,10 @@ plot_change(reports_ns, var = "criticals", rolling_window = 30)
 plot_change(reports_ns, var = "vaccinations", rolling_window = 30)
 plot_change(reports_ns, var = "boosters_1", rolling_window = 7)
 ```
+```{r include=FALSE}
+plot_change(reports_province$NS, var = "cases", rolling_window = 30,
+            per_1000 = TRUE, population = 971395)
+```
 
 
 ## Colors
