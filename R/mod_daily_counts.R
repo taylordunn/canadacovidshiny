@@ -4,9 +4,6 @@
 #'   criticals, fatalities, vaccinations, and boosters).
 #'
 #' @param id,input,output,session Internal parameters for `shiny`.
-#' @param reports_data The day-to-day reports data frame, either overall or for
-#'   a single province.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList fluidRow icon span
@@ -29,13 +26,14 @@ mod_daily_counts_ui <- function(id) {
 
 #' daily_counts server function
 #'
+#' @param reports_data The day-to-day reports data frame, either overall or for
+#'   a single province.
 #' @noRd
 #'
 #' @importFrom shinydashboard renderValueBox valueBox
-#' @importFrom dplyr filter
+#' @importFrom dplyr filter mutate
 #' @importFrom scales comma
 #' @importFrom purrr map walk
-#' @importFrom stringr str_to_sentence
 mod_daily_counts_server <- function(id, reports_data) {
   # Get the most recent numbers
   data <- reactive(
@@ -73,10 +71,11 @@ mod_daily_counts_server <- function(id, reports_data) {
       vars,
       function(var) {
         output[[var]] <- renderValueBox({
-          valueBox(
+          valueBoxCustom(
             var_counts[[var]](),
             subtitle = var_labels[[var]],
-            color = var_colors[[var]], icon = var_icons[[var]]
+            background = var_colors_pastel[[var]],
+            icon = var_icons[[var]]
           )
         })
       })

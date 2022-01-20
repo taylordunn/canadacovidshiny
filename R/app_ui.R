@@ -14,14 +14,14 @@ app_ui <- function(request) {
                       titleWidth = 450),
       dashboardSidebar(
         sidebarMenu(
-          menuItem("Overall", tabName = "overall", icon = icon("dashboard")),
+          menuItem("Overall", tabName = "overall"),
           menuItem("Alberta", tabName = "AB"),
           menuItem("British Columbia", tabName = "BC"),
           menuItem("Manitoba", tabName = "MB"),
-          menuItem("New Brunswick", tabName = "NB", icon = icon("th")),
+          menuItem("New Brunswick", tabName = "NB"),
           menuItem("Newfoundland and Labrador", tabName = "NL"),
           menuItem("Northwest Territories", tabName = "NT"),
-          menuItem("Nova Scotia", tabName = "NS", icon = icon("th")),
+          menuItem("Nova Scotia", tabName = "NS"),
           menuItem("Nunavut", tabName = "NU"),
           menuItem("Ontario", tabName = "ON"),
           menuItem("Prince Edward Island", tabName = "PE"),
@@ -36,19 +36,28 @@ app_ui <- function(request) {
         tabItems(
           tabItem(
             tabName = "overall",
-            mod_daily_counts_ui("overall"),
-            mod_change_plot_ui("overall")
+            mod_daily_counts_ui("overall")
+            # fluidRow(mod_change_plot_ui("overall_1"),
+            #          mod_change_plot_ui("overall_2"),
+            #          mod_change_plot_ui("overall_3"))
           ),
           tabItem(
             tabName = "AB",
             mod_last_updated_ui("AB"),
             mod_daily_counts_ui("AB")
-            #mod_change_plot_ui("AB")
+            # box(
+            #   title = span(icon("chart-line"), "Change per day"),
+            #   collapsible = TRUE, width = 12,
+            #   mod_change_plot_ui("AB_1"),
+            #   mod_change_plot_ui("AB_2"),
+            #   mod_change_plot_ui("AB_3")
+            # )
           ),
           tabItem(
             tabName = "BC",
             mod_last_updated_ui("BC"),
-            mod_daily_counts_ui("BC")
+            mod_daily_counts_ui("BC"),
+            mod_change_plot_box_ui("BC")
             #mod_change_plot_ui("BC")
           ),
           tabItem(
@@ -69,7 +78,8 @@ app_ui <- function(request) {
           tabItem(
             tabName = "NS",
             mod_last_updated_ui("NS"),
-            mod_daily_counts_ui("NS")
+            mod_daily_counts_ui("NS"),
+            mod_change_plot_box_ui("NS")
           ),
           tabItem(
             tabName = "NT",

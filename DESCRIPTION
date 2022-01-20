@@ -17,6 +17,7 @@ Imports:
     htmltools,
     magrittr,
     pins,
+    pkgload,
     processx,
     purrr,
     RcppRoll,

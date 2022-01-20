@@ -7,7 +7,8 @@
 #' @importFrom pins board_register_github
 register_github_board <- function() {
   pins::board_register_github(
-    name = "github", repo = "taylordunn/canadacovidshiny", path = "data/pins"
+    name = "github", repo = "taylordunn/canadacovidshiny", path = "data/pins",
+    token = Sys.getenv("GITHUB_PAT")
   )
 }
 

@@ -1,0 +1,11 @@
+name: canadacovidshiny
+title:
+username:
+account: taylor-dunn
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5472199
+bundleId: 5486931
+url: https://taylor-dunn.shinyapps.io/canadacovidshiny/
+when: 1642633162.18417
+lastSyncTime: 1642633162.18417

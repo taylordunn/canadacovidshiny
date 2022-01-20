@@ -12,7 +12,7 @@ mod_last_updated_ui <- function(id) {
   tagList(
     box(
       title = span(icon("info-circle"), "Data last updated"),
-      #solidHeader = TRUE,
+      solidHeader = TRUE,
       collapsible = TRUE, width = 12,
       textOutput(ns("last_updated")),
       actionButton(ns("check_updated"), "Check for new data")
@@ -25,13 +25,15 @@ mod_last_updated_ui <- function(id) {
 #' @noRd
 #'
 #' @importFrom rlang .env
+#' @importFrom dplyr filter anti_join pull
+#' @importFrom canadacovid get_provinces get_reports
 mod_last_updated_server <- function(id, provinces, reports) {
   moduleServer(id, function(input, output, session) {
     output$last_updated <- renderText({
       d <- provinces() %>% dplyr::filter(code == .env$id)
 
       paste0(
-        "Data from the province last updated at ",
+        "Data from the province was last reported at ",
         d$updated_at, " (status: ", d$data_status, ")"
       )
     })

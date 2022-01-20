@@ -1,21 +1,8 @@
-#' The list of colors for plotting associated with the different variables.
-#'
-#' @noRd
-var_colors_plot <-
-  list(
-    "cases" = "#f8961e",
-    "hospitalizations" = "#f3722c",
-    "criticals" = "#f3722c",
-    "fatalities" = "#f94144",
-    "recoveries" = "#90be6d",
-    "vaccinations" = "#43aa8b",
-    "boosters_1" = "#577590"
-  )
 #' For UI element colors, we are restricted to a select few colors.
 #' See `?shinydashboard::validColors`
 #'
 #' @noRd
-var_colors <-
+var_colors_ui <-
   list(
     "cases" = "yellow",
     "hospitalizations" = "orange",
@@ -24,6 +11,20 @@ var_colors <-
     "recoveries" = "green",
     "vaccinations" = "light-blue",
     "boosters_1" = "blue"
+  )
+
+#' The list of colors for plotting associated with the different variables.
+#'
+#' @noRd
+var_colors_pastel <-
+  list(
+    "cases" = "#F3B460",
+    "hospitalizations" = "#F19C67",
+    "criticals" = "#EE835D",
+    "fatalities" = "#E26355",
+    "recoveries" = "#90be6d",
+    "vaccinations" = "#43aa8b",
+    "boosters_1" = "#577590"
   )
 
 #' Icons for the variables.
@@ -85,7 +86,7 @@ plot_change <- function(
   rolling_window = 7
 ) {
   var <- match.arg(var)
-  var_color <- var_colors[[var]]
+  var_color <- var_colors_pastel[[var]]
   change_var <- paste0("change_", var)
   change_var_rolling_avg <- paste0(change_var, "_rolling_avg")
 
@@ -107,7 +108,7 @@ plot_change <- function(
   )
 
   reports %>%
-    ggplot2::ggplot(aes(x = date, y = !!sym(change_var_rolling_avg))) +
+    ggplot2::ggplot(ggplot2::aes(x = date, y = !!sym(change_var_rolling_avg))) +
     ggplot2::geom_line(size = 1, color = var_color) +
     ggplot2::geom_point(data = . %>% dplyr::filter(date == max(date)),
                size = 2, color = var_color) +

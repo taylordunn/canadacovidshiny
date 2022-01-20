@@ -8,3 +8,6 @@ $run_dev.*
 ^README\.Rmd$
 ^CODE_OF_CONDUCT\.md$
 ^data/pins$
+^app\.R$
+^rsconnect$
+^.Renviron$
