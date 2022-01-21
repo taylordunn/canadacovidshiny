@@ -91,5 +91,5 @@ read_reports <- function(choice = NULL) {
 #'
 #' @importFrom pins pin
 write_data <- function(data, name) {
-  pins::pin(data, name = name, board = "github")
+  pins::pin(data, name = tolower(name), board = "github")
 }

@@ -36,6 +36,7 @@ app_ui <- function(request) {
         tabItems(
           tabItem(
             tabName = "overall",
+            mod_last_updated_ui("overall"),
             mod_daily_counts_ui("overall"),
             mod_change_plot_box_ui("overall")
           ),
