@@ -13,7 +13,7 @@ columns:
   gdp: integer
   geographic: logical
   data_status: character
-  updated_at: POSIXlt
+  updated_at: POSIXct
   density: numeric
 filenames:
   data.csv: data.csv
