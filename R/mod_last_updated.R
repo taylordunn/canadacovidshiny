@@ -64,10 +64,10 @@ mod_last_updated_server <- function(id, provinces, reports) {
       provinces_new <- canadacovid::get_provinces()
 
       if (identical(provinces(), provinces_new)) {
+        message("Provinces has not been updated.")
+      } else {
         message("Updating provinces.")
         provinces(provinces_new)
-      } else {
-        message("Provinces is not new.")
       }
 
       # Compare the `updated_at` timestamps to determine which provinces have

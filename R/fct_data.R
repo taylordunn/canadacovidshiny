@@ -39,6 +39,7 @@ province_timezones <- list(
 #'
 #' @return A data frame.
 #'
+#' @noRd
 #' @importFrom pins pin_get
 read_provinces <- function() {
   pins::pin_get("provinces", board = "github")
@@ -51,6 +52,7 @@ read_provinces <- function() {
 #'
 #' @return A data frame.
 #'
+#' @noRd
 #' @importFrom pins pin_get
 read_summary <- function(split = c("overall", "province")) {
   split <- match.arg(split)
@@ -65,6 +67,7 @@ read_summary <- function(split = c("overall", "province")) {
 #' @return A single data frame, or a named list of data frames (if `choice`
 #'   is `NULL`).
 #'
+#' @noRd
 #' @importFrom purrr map
 #' @importFrom pins pin_get
 read_reports <- function(choice = NULL) {
@@ -84,12 +87,32 @@ read_reports <- function(choice = NULL) {
   }
 }
 
-#' Reads in the reports data from pins board
+#' Write a data frame to the pins board
 #'
 #' @param data The data to save to the pin board.
 #' @param name The name to give the data.
 #'
+#' @noRd
 #' @importFrom pins pin
 write_data <- function(data, name) {
   pins::pin(data, name = tolower(name), board = "github")
+}
+
+#' Write a report to the pins board and compute some extra variables
+#'
+#' @param data The data to save to the pin board.
+#' @param name The name to give the data.
+#'
+#' @noRd
+#'
+#' @importFrom pins pin
+write_reports <- function(report, name) {
+  report %>%
+    dplyr::mutate(
+      change_active = active_cases - active_recoveries - active_fatalities,
+      total_active = total_cases - total_recoveries - total_fatalities,
+      positivity_rate = change_cases / change_tests
+    ) %>%
+    pins::pin(name = tolower(name), board = "github")
+
 }

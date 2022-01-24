@@ -29,7 +29,9 @@ app_ui <- function(request) {
           menuItem("Saskatchewan", tabName = "SK"),
           menuItem("Yukon", tabName = "YT"),
           menuItem("Source code", icon = icon("file-code-o"),
-                   href = "https://github.com/taylordunn/canadacovidshiny")
+                   href = "https://github.com/taylordunn/canadacovidshiny"),
+          menuItem("Raw data", icon = icon("database"),
+                   href = "https://github.com/taylordunn/canadacoviddata/tree/main/data-raw")
         )
       ),
       dashboardBody(

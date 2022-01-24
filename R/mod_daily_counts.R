@@ -38,11 +38,7 @@ mod_daily_counts_server <- function(id, reports_data) {
   # Get the most recent numbers
   data <- reactive(
     reports_data() %>%
-      dplyr::filter(date == max(date)) %>%
-      # Instead of reporting cumulative cases, report an estimate of active cases
-      dplyr::mutate(
-        total_cases = total_cases - total_recoveries - total_fatalities
-      )
+      dplyr::filter(date == max(date)) #%>%
   )
   vars <- c("cases", "hospitalizations", "criticals", "fatalities",
             "vaccinations", "boosters_1")
@@ -57,10 +53,16 @@ mod_daily_counts_server <- function(id, reports_data) {
   var_counts <- purrr::map(
     vars,
     function(var) {
-      reactive(
-        paste0(scales::comma(data()[[paste0("change_", var)]]), " (",
-               scales::comma(data()[[paste0("total_", var)]]), ")")
-      )
+      reactive({
+        primary_count <- scales::comma(data()[[paste0("change_", var)]])
+        if (var == "cases") {
+          # Report current active cases instead of cumulative
+          secondary_count <- scales::comma(data()[["total_active"]])
+        } else {
+          secondary_count <- scales::comma(data()[[paste0("total_", var)]])
+        }
+        paste0(primary_count, " (", secondary_count, ")")
+      })
     }
   ) %>%
     setNames(vars)
