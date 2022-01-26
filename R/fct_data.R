@@ -7,7 +7,7 @@
 #' @importFrom pins board_register_github
 register_github_board <- function() {
   pins::board_register_github(
-    name = "github", repo = "taylordunn/canadacovidshiny", path = "data/pins",
+    name = "github", repo = "taylordunn/canadacoviddata", path = "data-raw",
     token = Sys.getenv("GITHUB_PAT")
   )
 }
@@ -79,7 +79,7 @@ read_reports <- function(choice = NULL) {
       choices,
       ~ pins::pin_get(paste0("reports_", .x), board = "github")
     ) %>%
-      setNames(choices)
+      stats::setNames(choices)
   } else {
     choice <- match.arg(tolower(choice), choices = choices)
 
@@ -106,12 +106,15 @@ write_data <- function(data, name) {
 #' @noRd
 #'
 #' @importFrom pins pin
+#' @importFrom rlang .data
 write_reports <- function(report, name) {
   report %>%
     dplyr::mutate(
-      change_active = active_cases - active_recoveries - active_fatalities,
-      total_active = total_cases - total_recoveries - total_fatalities,
-      positivity_rate = change_cases / change_tests
+      change_active = .data$change_cases - .data$change -
+        .data$change_fatalities,
+      total_active = .data$total_cases - .data$total_recoveries -
+        .data$total_fatalities,
+      positivity_rate = .data$change_cases / .data$change_tests
     ) %>%
     pins::pin(name = tolower(name), board = "github")
 

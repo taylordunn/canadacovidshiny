@@ -21,7 +21,6 @@ mod_change_plot_ui <- function(id) {
 mod_change_plot_server <- function(id, reports_data, var) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    browser()
 
     output$change_plot <- renderPlot({
       plot_change(reports_data(), var, rolling_window = 7)
@@ -73,7 +72,6 @@ mod_change_plot_box_server <- function(id, reports_data, population) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    #browser()
     output$change_plot_1 <- plotly::renderPlotly({
       plot_change(
         reports_data(), input$var_top,

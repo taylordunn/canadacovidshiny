@@ -93,7 +93,7 @@ var_labels <- list(
 #' @param population The population of the province (or overall).
 #'
 #' @noRd
-#' @importFrom rlang sym
+#' @importFrom rlang sym .data
 plot_change <- function(
   reports,
   var = c("cases", "hospitalizations", "criticals", "fatalities", "recoveries",
@@ -113,7 +113,7 @@ plot_change <- function(
                                           align = "right", fill = NA),
              .names = "{.col}_rolling_avg")
     ) %>%
-    dplyr::filter(dplyr::across(change_var_rolling_avg, ~ !is.na(.)))
+    dplyr::filter(dplyr::across(change_var_rolling_avg, ~ !is.na(.x)))
 
   if (per_1000 & !is.null(population)) {
     reports <- reports %>%

@@ -23,6 +23,7 @@ Imports:
     processx,
     purrr,
     RcppRoll,
+    rlang,
     scales,
     shiny (>= 1.6.0),
     shinydashboard,

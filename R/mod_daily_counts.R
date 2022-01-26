@@ -13,7 +13,7 @@ mod_daily_counts_ui <- function(id) {
   tagList(
     box(
       title = span(icon("table"), "Daily counts"),
-      collapsible = TRUE, width = 12,
+      collapsible = TRUE, width = 9,
       valueBoxOutput(ns("cases")),
       valueBoxOutput(ns("hospitalizations")),
       valueBoxOutput(ns("criticals")),
@@ -38,7 +38,7 @@ mod_daily_counts_server <- function(id, reports_data) {
   # Get the most recent numbers
   data <- reactive(
     reports_data() %>%
-      dplyr::filter(date == max(date)) #%>%
+      dplyr::filter(date == max(date))
   )
   vars <- c("cases", "hospitalizations", "criticals", "fatalities",
             "vaccinations", "boosters_1")
@@ -65,7 +65,7 @@ mod_daily_counts_server <- function(id, reports_data) {
       })
     }
   ) %>%
-    setNames(vars)
+    stats::setNames(vars)
 
 
   moduleServer(id, function(input, output, session) {

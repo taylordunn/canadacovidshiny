@@ -5,7 +5,9 @@ account: taylor-dunn
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5472199
-bundleId: 5486931
+bundleId: 5508586
 url: https://taylor-dunn.shinyapps.io/canadacovidshiny/
-when: 1642633162.18417
-lastSyncTime: 1642633162.18417
+when: 1643166698.40288
+lastSyncTime: 1643166698.40288
+asMultiple: FALSE
+asStatic: FALSE

@@ -32,3 +32,10 @@ valueBoxCustom <- function(value, subtitle, icon = NULL, color = "white",
     boxContent
   )
 }
+
+pin_changed_time <- function(name, board, extract = NULL) {
+  pin_path <- pins::board_pin_get(pins::board_get(board), name, extract = extract)
+  pin_files <- file.path(pin_path, dir(pin_path))
+
+  max(file.info(pin_files)[, "mtime"])
+}

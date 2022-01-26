@@ -17,9 +17,6 @@ mod_last_updated_ui <- function(id) {
       fluidRow(
         column(4,
           htmlOutput(ns("last_updated")),
-        ),
-        column(4,
-          actionButton(ns("check_updated"), "Check for new data")
         )
       )
     )
@@ -30,7 +27,7 @@ mod_last_updated_ui <- function(id) {
 #'
 #' @noRd
 #'
-#' @importFrom rlang .env
+#' @importFrom rlang .env .data
 #' @importFrom dplyr filter anti_join pull
 #' @importFrom canadacovid get_provinces get_reports
 #' @importFrom lubridate with_tz
@@ -41,7 +38,7 @@ mod_last_updated_server <- function(id, provinces, reports) {
         d_prov <- ""
       } else {
         d_prov <- provinces() %>% dplyr::filter(code == .env$id) %>%
-          dplyr::pull(updated_at) %>%
+          dplyr::pull(.data$updated_at) %>%
           lubridate::with_tz(tzone = province_timezones[[id]]) %>%
           format(usetz = TRUE)
         d_prov <- paste0(
@@ -49,7 +46,9 @@ mod_last_updated_server <- function(id, provinces, reports) {
         )
       }
 
-      d_api <- reports[[id]]() %>% dplyr::pull(last_updated) %>% unique() %>%
+      d_api <- reports[[id]]() %>%
+        dplyr::pull(.data$last_updated) %>%
+        unique() %>%
         lubridate::with_tz(tzone = province_timezones[[id]]) %>%
         format(usetz = TRUE)
 
@@ -58,34 +57,6 @@ mod_last_updated_server <- function(id, provinces, reports) {
         "Data from the API was last updated at: ", d_api, ".<br>",
         "(Timezone: ", province_timezones[[id]], ")"
       ))
-    })
-
-    observeEvent(input$check_updated, {
-      provinces_new <- canadacovid::get_provinces()
-
-      if (identical(provinces(), provinces_new)) {
-        message("Provinces has not been updated.")
-      } else {
-        message("Updating provinces.")
-        provinces(provinces_new)
-      }
-
-      # Compare the `updated_at` timestamps to determine which provinces have
-      #  been updated
-      # provinces_updated <- provinces_new %>%
-      #   dplyr::anti_join(provinces(), by = c("code", "updated_at")) %>%
-      #   dplyr::pull(code)
-      #
-      # if (length(provinces_updated) > 0) {
-      #   provinces(provinces_new)
-      #
-      #   # Update the reports of all the new data
-      #   for (p in provinces_updated) {
-      #     reports[[p]](canadacovid::get_reports(province = p))
-      #   }
-      #   # Update the overall data as well
-      #   reports$overall(canadacovid::get_reports("overall"))
-      # }
     })
   })
 }
