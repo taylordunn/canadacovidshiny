@@ -13,7 +13,7 @@ mod_last_updated_ui <- function(id) {
     box(
       title = span(icon("info-circle"), "Data last updated"),
       solidHeader = TRUE,
-      collapsible = TRUE, width = 12,
+      collapsible = TRUE, collapsed = TRUE, width = 12,
       fluidRow(
         column(4,
           htmlOutput(ns("last_updated")),
@@ -54,8 +54,7 @@ mod_last_updated_server <- function(id, provinces, reports) {
 
       HTML(paste0(
         d_prov,
-        "Data from the API was last updated at: ", d_api, ".<br>",
-        "(Timezone: ", province_timezones[[id]], ")"
+        "Data from the API was last updated at: ", d_api, "."
       ))
     })
   })
