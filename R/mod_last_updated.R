@@ -12,8 +12,7 @@ mod_last_updated_ui <- function(id) {
   tagList(
     box(
       title = span(icon("info-circle"), "Data last updated"),
-      solidHeader = TRUE,
-      collapsible = TRUE, collapsed = TRUE, width = 12,
+      solidHeader = TRUE, collapsible = TRUE, collapsed = TRUE, width = 12,
       fluidRow(
         column(4,
           htmlOutput(ns("last_updated")),

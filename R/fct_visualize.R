@@ -66,8 +66,8 @@ theme_canadacovid <- function(base_size = 16, base_family = "roboto",
 #'
 #' @noRd
 set_plotting_defaults <- function() {
-  # sysfonts::font_add_google("Roboto Condensed", "roboto")
-  # showtext::showtext_auto()
+  sysfonts::font_add_google("Roboto Condensed", "roboto")
+  showtext::showtext_auto()
 
   ggplot2::theme_set(theme_canadacovid())
 }

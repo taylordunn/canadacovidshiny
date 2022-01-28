@@ -11,8 +11,6 @@
 #' @param href An optional URL to link to.
 valueBoxCustom <- function(value, subtitle, icon = NULL, color = "white",
                            background = "aqua", width = 4, href = NULL) {
-  # validateColor(color)
-  # if (!is.null(icon)) shinydashboard::tagAssert(icon, type = "i")
 
   style <- paste0("color: ", color, "; background-color: ", background, ";")
   boxContent <- div(
@@ -31,11 +29,4 @@ valueBoxCustom <- function(value, subtitle, icon = NULL, color = "white",
     class = if (!is.null(width)) paste0("col-sm-", width),
     boxContent
   )
-}
-
-pin_changed_time <- function(name, board, extract = NULL) {
-  pin_path <- pins::board_pin_get(pins::board_get(board), name, extract = extract)
-  pin_files <- file.path(pin_path, dir(pin_path))
-
-  max(file.info(pin_files)[, "mtime"])
 }
