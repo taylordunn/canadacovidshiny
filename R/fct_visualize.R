@@ -144,7 +144,95 @@ plot_change <- function(
       title = p_title, y = NULL, x = NULL
     ) +
     ggplot2::scale_x_date(expand = ggplot2::expansion(mult = c(0, 0.01))) +
-    theme_canadacovid(base_family = "") +
+    theme_canadacovid() +
+    # Note that the secondary axis will not render if using plotly
+    ggplot2::theme(axis.text.y.right = ggtext::element_markdown())
+
+  if (log_var) {
+    p <- p + ggplot2::scale_y_log10(
+      sec.axis = ggplot2::sec_axis(~ ., breaks = latest_val,
+                                   labels = latest_val_label)
+    )
+  } else {
+    p <- p + ggplot2::scale_y_continuous(
+      sec.axis = ggplot2::sec_axis(~ ., breaks = latest_val,
+                                   labels = latest_val_label)
+    )
+  }
+
+  if (!is.null(min_date) & !is.null(max_date)) {
+    p <- p + ggplot2::coord_cartesian(xlim = c(min_date, max_date))
+  }
+
+  p
+}
+
+#' Plot total/cumulative over time.
+#'
+#' @param reports The reports data from a single province (or overall).
+#' @param var One of the counts in the reports data.
+#' @param rolling_window Number of days to average over.
+#' @param log_var Plot on a log 10 scale.
+#' @param per_1000 Plot per 1000 people (requires numeric `population`).
+#' @param population The population of the province (or overall).
+#'
+#' @noRd
+#' @importFrom rlang sym .data
+plot_total <- function(
+  reports,
+  var = c("cases", "hospitalizations", "criticals", "fatalities", "recoveries",
+          "vaccinations", "boosters_1"),
+  rolling_window = 7, log_var = FALSE, per_1000 = FALSE, population = NULL,
+  min_date = NULL, max_date = NULL
+) {
+  var <- match.arg(var)
+  var_color <- var_colors_pastel[[var]]
+  total_var <- paste0("total_", var)
+  total_var_rolling_avg <- paste0(total_var, "_rolling_avg")
+
+  reports <- reports %>%
+    dplyr::mutate(
+      dplyr::across(total_var,
+                    ~ RcppRoll::roll_mean(.x, n = rolling_window,
+                                          align = "right", fill = NA),
+             .names = "{.col}_rolling_avg")
+    ) %>%
+    dplyr::filter(dplyr::across(total_var_rolling_avg, ~ !is.na(.x)))
+
+  if (per_1000 & !is.null(population)) {
+    reports <- reports %>%
+      dplyr::mutate(
+        dplyr::across(total_var_rolling_avg, ~ 1000 * .x / population)
+      )
+    p_title <- paste0(stringr::str_to_sentence(var), " per 1000 people",
+                      " (", rolling_window, "-day rolling average)")
+  } else {
+    p_title <- paste0(stringr::str_to_sentence(var),
+                      " (", rolling_window, "-day rolling average)")
+  }
+
+  latest_val <- reports %>%
+    dplyr::filter(date == max(date)) %>%
+    dplyr::pull(total_var_rolling_avg) %>%
+    round(1)
+  latest_val_label <- glue::glue(
+    "<b style='color:{var_color}'>{latest_val}</b>"
+  )
+
+  p <- reports %>%
+    ggplot2::ggplot(ggplot2::aes(x = date, y = !!sym(total_var_rolling_avg))) +
+    ggplot2::geom_ribbon(
+      ggplot2::aes(ymin = 0, ymax = !!sym(total_var_rolling_avg)),
+      fill = var_color, alpha = 0.5
+    ) +
+    ggplot2::geom_line(size = 1, color = var_color) +
+    ggplot2::geom_point(data = . %>% dplyr::filter(date == max(date)),
+               size = 2, color = var_color) +
+    ggplot2::labs(
+      title = p_title, y = NULL, x = NULL
+    ) +
+    ggplot2::scale_x_date(expand = ggplot2::expansion(mult = c(0, 0.01))) +
+    theme_canadacovid() +
     # Note that the secondary axis will not render if using plotly
     ggplot2::theme(axis.text.y.right = ggtext::element_markdown())
 
