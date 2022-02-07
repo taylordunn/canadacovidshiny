@@ -80,7 +80,7 @@ mod_change_plot_box_server <- function(id, reports_data, population) {
         per_1000 = input$change_per_1000, population = population(),
         min_date = input$change_date_range[1],
         max_date = input$change_date_range[2]
-      ) %>% plotly::ggplotly()
+      ) %>% plotly::ggplotly() %>% plotly_config()
     })
     output$change_plot_2 <- plotly::renderPlotly({
       plot_change(
@@ -89,7 +89,7 @@ mod_change_plot_box_server <- function(id, reports_data, population) {
         per_1000 = input$change_per_1000, population = population(),
         min_date = input$change_date_range[1],
         max_date = input$change_date_range[2]
-      ) %>% plotly::ggplotly()
+      ) %>% plotly::ggplotly() %>% plotly_config()
     })
     output$change_plot_3 <- plotly::renderPlotly({
       plot_change(
@@ -98,7 +98,7 @@ mod_change_plot_box_server <- function(id, reports_data, population) {
         per_1000 = input$change_per_1000, population = population(),
         min_date = input$change_date_range[1],
         max_date = input$change_date_range[2]
-      ) %>% plotly::ggplotly()
+      ) %>% plotly::ggplotly() %>% plotly_config()
     })
   })
 }

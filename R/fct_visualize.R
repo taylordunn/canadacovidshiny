@@ -284,3 +284,11 @@ plot_total <- function(
   p
 }
 
+plotly_config <- function(p) {
+  plotly::config(
+    p,
+    modeBarButtonsToRemove = c("toImage", "select2d", "lasso2d",
+                               "zoomIn2d", "zoomOut2d", "resetScale2d",
+                               "hoverClosestCartesian",
+                               "hoverCompareCartesian"))
+}
