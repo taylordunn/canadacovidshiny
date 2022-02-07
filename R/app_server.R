@@ -41,6 +41,7 @@ app_server <- function(input, output, session) {
     function(p) {
       mod_last_updated_server(p, provinces, reports)
       mod_daily_counts_server(p, reports[[p]])
+      mod_vaccines_server(p, reports[[p]], population_data[[p]])
       mod_change_plot_box_server(p, reports[[p]], population_data[[p]])
       mod_total_plot_box_server(p, reports[[p]], population_data[[p]])
     }

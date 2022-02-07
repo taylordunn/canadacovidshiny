@@ -1,49 +1,3 @@
-#' For UI element colors, we are restricted to a select few colors.
-#' See `?shinydashboard::validColors`
-#'
-#' @noRd
-var_colors_ui <-
-  list(
-    "cases" = "yellow",
-    "hospitalizations" = "orange",
-    "criticals" = "orange",
-    "fatalities" = "red",
-    "recoveries" = "green",
-    "vaccinations" = "light-blue",
-    "boosters_1" = "blue"
-  )
-
-#' The list of colors for plotting associated with the different variables.
-#'
-#' @noRd
-var_colors_pastel <-
-  list(
-    "cases" = "#F3B460",
-    "hospitalizations" = "#F19C67",
-    "criticals" = "#EE835D",
-    "fatalities" = "#E26355",
-    "recoveries" = "#90be6d",
-    "vaccinations" = "#43aa8b",
-    "boosters_1" = "#577590"
-  )
-
-#' Icons for the variables.
-#'
-#' @noRd
-var_icons <-
-  list(
-    "cases" = icon("virus"),
-    "hospitalizations" = icon("hospital"),
-    "criticals" = icon("procedures"),
-    "fatalities" = icon("skull"),
-    #"recoveries" = icon("hand-holding-medical"),
-    "recoveries" = icon("virus-slash"),
-    "vaccinations" = icon("syringe"),
-    "boosters_1" = icon("syringe"),
-    #"boosters_1" = icon("syringe")
-    "boosters_1" = icon("shield-virus")
-  )
-
 #' ggplot2 theme.
 #'
 #' @noRd
@@ -72,16 +26,83 @@ set_plotting_defaults <- function() {
   ggplot2::theme_set(theme_canadacovid())
 }
 
+#' For UI element colors, we are restricted to a select few colors.
+#' See `?shinydashboard::validColors`
+#'
+#' @noRd
+var_colors_ui <-
+  list(
+    "cases" = "yellow",
+    "hospitalizations" = "orange",
+    "criticals" = "orange",
+    "fatalities" = "red",
+    "recoveries" = "green",
+    "vaccinations" = "light-blue",
+    "boosters_1" = "blue"
+  )
 
+#' The list of colors for plotting associated with the different variables.
+#'
+#' @noRd
+var_colors_pastel <-
+  list(
+    "cases" = "#F3B460",
+    "tests" = "#F3B460", "positivity_rate" = "#F3B460",
+    "hospitalizations" = "#F19C67",
+    "criticals" = "#EE835D",
+    "fatalities" = "#E26355",
+    "recoveries" = "#90be6d",
+    "vaccinations" = "#43aa8b",
+    "boosters_1" = "#577590",
+    "vaccinated" = "#43aa8b",
+    "percent_vaccinated" = "#43aa8b",
+    "percent_boosters_1" = "#577590"
+  )
+
+#' Icons for the variables.
+#'
+#' @noRd
+var_icons <-
+  list(
+    "cases" = icon("virus"),
+    "tests" = icon("vial"),
+    "hospitalizations" = icon("hospital"),
+    "criticals" = icon("procedures"),
+    "fatalities" = icon("skull"),
+    "recoveries" = icon("virus-slash"),
+    "vaccinations" = icon("syringe"),
+    "boosters_1" = icon("syringe"),
+    "vaccinated" = icon("syringe"),
+    "percent_vaccinated" = icon("shield-virus"),
+    "percent_boosters_1" = icon("shield-virus")
+  )
 var_labels <- list(
-  "Cases" = "cases",
-  "Hospitalizations" = "hospitalizations",
-  "Criticals" =  "criticals",
-  "Fatalities" = "fatalities",
-  "Recoveries" = "recoveries",
-  "Vaccinations" = "vaccinations",
-  "Boosters" = "boosters_1"
+  "cases" = "Cases",
+  "hospitalizations" = "Hospitalizations",
+  "criticals" = "Criticals",
+  "fatalities" = "Fatalities",
+  "recoveries" = "Recoveries",
+  "vaccinations" = "Vaccine doses",
+  "boosters_1" = "Boosters",
+  "vaccinated" = "People fully vaccinated",
+  "percent_vaccinated" = "Percent fully vaccinated",
+  "percent_boosters_1" = "Percent boosted",
+  "tests" = "Tests administered",
+  "positivity_rate" = "Positive test rate"
 )
+
+change_plot_vars <- var_labels[c("cases", "hospitalizations", "criticals",
+                                "fatalities", "recoveries", "vaccinations",
+                                "boosters_1", "vaccinated",
+                                "tests")]
+total_plot_vars <- var_labels[c("cases", "hospitalizations", "criticals",
+                                "fatalities", "recoveries", "vaccinations",
+                                "boosters_1", "vaccinated",
+                                "percent_vaccinated", "percent_boosters_1",
+                                "tests", "positivity_rate")]
+# In order to be used for in `shiny::selectInput`, reverse the names/values
+change_plot_vars <- setNames(names(change_plot_vars), change_plot_vars)
+total_plot_vars <- setNames(names(total_plot_vars), total_plot_vars)
 
 #' Plot change over time.
 #'
@@ -97,7 +118,7 @@ var_labels <- list(
 plot_change <- function(
   reports,
   var = c("cases", "hospitalizations", "criticals", "fatalities", "recoveries",
-          "vaccinations", "boosters_1"),
+          "vaccinations", "boosters_1", "vaccinated", "tests"),
   rolling_window = 7, log_var = FALSE, per_1000 = FALSE, population = NULL,
   min_date = NULL, max_date = NULL
 ) {
@@ -120,10 +141,10 @@ plot_change <- function(
       dplyr::mutate(
         dplyr::across(change_var_rolling_avg, ~ 1000 * .x / population)
       )
-    p_title <- paste0(stringr::str_to_sentence(var), " per 1000 people",
+    p_title <- paste0(var_labels[var], " per 1000 people",
                       " (", rolling_window, "-day rolling average)")
   } else {
-    p_title <- paste0(stringr::str_to_sentence(var),
+    p_title <- paste0(var_labels[var],
                       " (", rolling_window, "-day rolling average)")
   }
 
@@ -181,13 +202,21 @@ plot_change <- function(
 plot_total <- function(
   reports,
   var = c("cases", "hospitalizations", "criticals", "fatalities", "recoveries",
-          "vaccinations", "boosters_1"),
+          "vaccinations", "boosters_1", "vaccinated",
+          "percent_vaccinated", "percent_boosters_1",
+          "tests", "positivity_rate"),
   rolling_window = 7, log_var = FALSE, per_1000 = FALSE, population = NULL,
   min_date = NULL, max_date = NULL
 ) {
   var <- match.arg(var)
   var_color <- var_colors_pastel[[var]]
-  total_var <- paste0("total_", var)
+  if (var %in% c("cases", "hospitalizations", "criticals", "fatalities",
+                 "recoveries", "vaccinations", "boosters_1", "vaccinated",
+                 "tests")) {
+    total_var <- paste0("total_", var)
+  } else {
+    total_var <- var
+  }
   total_var_rolling_avg <- paste0(total_var, "_rolling_avg")
 
   reports <- reports %>%
@@ -204,10 +233,10 @@ plot_total <- function(
       dplyr::mutate(
         dplyr::across(total_var_rolling_avg, ~ 1000 * .x / population)
       )
-    p_title <- paste0(stringr::str_to_sentence(var), " per 1000 people",
+    p_title <- paste0(var_labels[var], " per 1000 people",
                       " (", rolling_window, "-day rolling average)")
   } else {
-    p_title <- paste0(stringr::str_to_sentence(var),
+    p_title <- paste0(var_labels[var],
                       " (", rolling_window, "-day rolling average)")
   }
 
@@ -254,3 +283,4 @@ plot_total <- function(
 
   p
 }
+

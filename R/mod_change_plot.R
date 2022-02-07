@@ -44,11 +44,11 @@ mod_change_plot_box_ui <- function(id) {
       fluidRow(
         column(3,
           selectInput(ns("change_var_top"), label = "Top",
-                      selected = "cases", choices = var_labels),
+                      selected = "cases", choices = change_plot_vars),
           selectInput(ns("change_var_mid"), label = "Middle",
-                      selected = "hospitalizations", choices = var_labels),
+                      selected = "hospitalizations", choices = change_plot_vars),
           selectInput(ns("change_var_bot"), label = "Bottom",
-                      selected = "criticals", choices = var_labels)
+                      selected = "criticals", choices = change_plot_vars)
         ),
         column(6,
           sliderInput(ns("change_rolling_window"),

@@ -44,11 +44,11 @@ mod_total_plot_box_ui <- function(id) {
       fluidRow(
         column(3,
           selectInput(ns("total_var_top"), label = "Top",
-                      selected = "hospitalizations", choices = var_labels),
+                      selected = "hospitalizations", choices = total_plot_vars),
           selectInput(ns("total_var_mid"), label = "Middle",
-                      selected = "criticals", choices = var_labels),
+                      selected = "criticals", choices = total_plot_vars),
           selectInput(ns("total_var_bot"), label = "Bottom",
-                      selected = "deaths", choices = var_labels)
+                      selected = "deaths", choices = total_plot_vars)
         ),
         column(6,
           sliderInput(ns("total_rolling_window"),
@@ -73,9 +73,15 @@ mod_total_plot_box_server <- function(id, reports_data, population) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    data <- reactive(
+      reports_data() %>%
+        dplyr::mutate(percent_vaccinated = total_vaccinated / population(),
+                      percent_boosters_1 = total_boosters_1 / population())
+    )
+
     output$total_plot_1 <- plotly::renderPlotly({
       plot_total(
-        reports_data(), input$total_var_top,
+        data(), input$total_var_top,
         rolling_window = input$total_rolling_window,
         per_1000 = input$total_per_1000, population = population(),
         min_date = input$total_date_range[1],
@@ -84,7 +90,7 @@ mod_total_plot_box_server <- function(id, reports_data, population) {
     })
     output$total_plot_2 <- plotly::renderPlotly({
       plot_total(
-        reports_data(), input$total_var_mid,
+        data(), input$total_var_mid,
         rolling_window = input$total_rolling_window,
         per_1000 = input$total_per_1000, population = population(),
         min_date = input$total_date_range[1],
@@ -93,7 +99,7 @@ mod_total_plot_box_server <- function(id, reports_data, population) {
     })
     output$total_plot_3 <- plotly::renderPlotly({
       plot_total(
-        reports_data(), input$total_var_bot,
+        data(), input$total_var_bot,
         rolling_window = input$total_rolling_window,
         per_1000 = input$total_per_1000, population = population(),
         min_date = input$total_date_range[1],

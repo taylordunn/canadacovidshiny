@@ -13,13 +13,19 @@ mod_daily_counts_ui <- function(id) {
   tagList(
     box(
       title = span(icon("table"), "Daily counts"),
-      collapsible = TRUE, width = 9,
-      valueBoxOutput(ns("cases")),
-      valueBoxOutput(ns("hospitalizations")),
-      valueBoxOutput(ns("criticals")),
-      valueBoxOutput(ns("fatalities")),
-      valueBoxOutput(ns("vaccinations")),
-      valueBoxOutput(ns("boosters_1"))
+      collapsible = TRUE, width = 8,
+      fluidRow(
+        valueBoxOutput(ns("cases")),
+        valueBoxOutput(ns("tests")),
+        valueBoxOutput(ns("recoveries"))
+      ),
+      fluidRow(
+        valueBoxOutput(ns("hospitalizations")),
+        valueBoxOutput(ns("criticals")),
+        valueBoxOutput(ns("fatalities"))
+      )
+      #valueBoxOutput(ns("vaccinations")),
+      #valueBoxOutput(ns("boosters_1"))
     )
   )
 }
@@ -40,24 +46,32 @@ mod_daily_counts_server <- function(id, reports_data) {
     reports_data() %>%
       dplyr::filter(date == max(date))
   )
-  vars <- c("cases", "hospitalizations", "criticals", "fatalities",
-            "vaccinations", "boosters_1")
+  vars <- c("cases", "tests", "recoveries",
+            "hospitalizations", "criticals", "fatalities")
   var_labels <- list(
     "cases" = "Cases (estimated active)",
+    "tests" = "Test positivity (tests administered)",
+    "recoveries" = "Recoveries (total)",
     "hospitalizations" = "Hospitalizations (total)",
     "criticals" = "Criticals (total)",
-    "fatalities" = "Fatalities (total)",
-    "vaccinations" = "Vaccinations (total)",
-    "boosters_1" = "Boosters (total)"
+    "fatalities" = "Fatalities (total)"
   )
   var_counts <- purrr::map(
     vars,
     function(var) {
       reactive({
-        primary_count <- scales::comma(data()[[paste0("change_", var)]])
+        if (var == "tests") {
+          # Report test positivity as primary, number tests secondary
+          primary_count <- scales::percent(data()$positivity_rate, 0.1)
+        } else {
+          primary_count <- scales::comma(data()[[paste0("change_", var)]])
+        }
+
         if (var == "cases") {
           # Report current active cases instead of cumulative
           secondary_count <- scales::comma(data()[["total_active"]])
+        } else if (var == "tests") {
+          secondary_count <- scales::comma(data()[[paste0("change_", var)]])
         } else {
           secondary_count <- scales::comma(data()[[paste0("total_", var)]])
         }
