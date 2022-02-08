@@ -20,7 +20,7 @@ The app may be unavailable or not working at times, probably because it
 has reached the usage limit for the month (25 active hours). For
 posterity, below is a screenshot of version 0.1.0 as of 2022-02-07:
 
-![](man/figures/dashboard-screenshot_2022-02-07)
+![](man/figures/dashboard-screenshot_2022-02-07.png)
 
 The data come from the [Canadian COVID-19 Tracker
 API](https://api.covid19tracker.ca/docs/1.0/overview). The data are
