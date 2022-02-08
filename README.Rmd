@@ -16,26 +16,19 @@ knitr::opts_chunk$set(
 # canadacovidshiny
 
 <!-- badges: start -->
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 <!-- badges: end -->
 
-The goal of `canadacovidshiny` is to ...
+This is a dashboard reporting the latest COVID-19 numbers and visualizing the trends over time, both overall and by province/territory.
 
-## Installation
+It is currently being hosted on shinyapps.io here: https://taylor-dunn.shinyapps.io/canadacovidshiny/.
 
-Install `canadacovidshiny` from GitHub with:
+The app may be unavailable or not working at times, probably because it has reached the usage limit for the month (25 active hours).
+For posterity, below is a screenshot of version 0.1.0 as of 2022-02-07:
 
-``` r
-# install.packages("remotes")
-remotes::install_github("taylordunn/canadacovidshiny")
-```
+![](man/figures/dashboard-screenshot_2022-02-07)
 
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-```{r example}
-library(canadacovidshiny)
-## basic example code
-```
+The data come from the [Canadian COVID-19 Tracker API](https://api.covid19tracker.ca/docs/1.0/overview).
+The data are periodically downloaded via the [`canadacovid` package](https://taylordunn.github.io/canadacovid/) to [this repository](https://github.com/taylordunn/canadacoviddata).
+The Shiny app checks the data and will reactively update only when the data are new.
 
